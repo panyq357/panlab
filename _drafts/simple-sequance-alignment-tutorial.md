@@ -13,9 +13,51 @@ title:  "简单的序列比对教程"
 
 了解这些文件格式，有助于更好地理解序列比对的过程中，数据都发生了什么变化。
 
+### FASTA
+
+序列比对中用到的参考基因组通常是 FASTA 格式的。FASTA 格式非常简单，下面是一个 FASTA 文件的例子。
+
+```
+>chr02
+ACCCTAAACCCTAAACCCTAAACCCTAAACCCTAAACCCTAACCCTAAACCCCTAACCCT
+AAACCCTAAACCCTAAACCCTAAACCCTAAACCCTAAACCCTAAACCCTAAACCCTAAAC
+CCTAAACCCTAAACCCTAAACCCTAAACCCTAAACCctaaaccctaaaccctaaacccta
+aaccctaaaccctaaaaccctaaaccctaaaccctaaaccctaaaccctaaaccctaaac
+cctaaaccctaaaccctaaccctaaaccctaaaccctaaaccctaaaccctaaaccctaa
+>chr05
+CCTAAACCCTAAACCCTAAACCCTAAACCCTAAACCCTAAACCCTAAACCCTAAACCCTA
+AACCCTAAACCCTAAACCCTAAACCCTAAACCCTAAACCCTAAACCCTAACCCTAAACCC
+TAAAACCCTAAACCCTAACCCTAAACCCTAAACCCTAAACCCTAAACCCTAAACCCTAAA
+CCCTAAACCCTAAACCCTAAACCCTAAACCCTAAACCCTAAACCCTAAACCCTAAACCCT
+AAACCCTAAACCCTAAACCCTAAACCCTAAACCCTAACCCTAAACCCTAAACCCTAAACC
+```
+
+其中 `>` 代表一段序列的开始，其后跟着的 `chr02` 是这段序列的名字，而之后跟着的行就是序列的具体内容，换行符会被忽略，直到下一个 `>`。
+
 ### FASTQ
 
-公司返的数据一般都是 FASTQ 格式的
+未经比对的原始测序数据通常是 FASTQ 格式的。下面是一个例子（`SRR15724032_2.fastq.gz` 文件的开头）。
+
+```
+@SRR15724032.1 1/2
+CGCCCTCCTTAACCGTGTCGACAAGTCCTCCAGTAGATGAGCAGATGGGAACCACTCCATATCTCATCCCTTGCAATTGGATGAGACCACATGGCTCAAACCTACTAGGAACAATTATAAAATCAGCAGATCGGAAGAGCGTCGTGTAGG
++
+FFFFFFFFFFF:FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF:FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF:FFFFFFF:FFF:FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+@SRR15724032.2 2/2
+TTTCAGTTGACAGTTCTTCTAGCAGATACAGCTTCTTTGGCAAAAGGCCCAATCTGATGCAAAAGCTCAAGAAGTGGGGAAGGGGCAAGGATGACGGAAGCAGCTTAGCTTCACCGACACAGTCCTTCACTAGTGACTCCCCAAAGAGCG
++
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF:FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF:FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF:FF
+```
+
+一条 read 由 4 行组成。第一行以 `@` 开头，后面紧跟这条 read 的名字；第二行是这条 read 的序列；第三行通常以 `+` 作为分隔符，第四行则是代表测序质量的字符串，与第二行等长。
+
+现在很多测序数据都是双端测序的，即测序时是从一个 DNA 片段的两端向中间测，所以一个测序数据由两个 FASTQ 文件组成（例如 `SRR15724032_1.fastq.gz` 和 `SRR15724032_2.fastq.gz`）。两个 FASTQ 里 reads 的顺序是匹配的，即文件 1 里的第 1 个 read 与 文件 2 的第 1 个 read 配对，文件 1 里的第 2 个 read 与 文件 2 的第 2 个 read 配对……
+
+现在的序列比对软件对双端测序数据进行特殊处理，使得比对结果能够利用双端数据的特性变得更准。
+
+### SAM/BAM
+
+SAM 格式的全称是 Sequence Alignment/Map，它在 FASTQ 的基础上添加了每个 reads 的比对信息。而 BAM 就是 Binary 的 SAM。BAM 可保留 SAM 的所有信息，并且体积更小，所以一般都会将比对的结果转化为 BAM 保存。
 
 ## 质检和过滤
 
@@ -23,7 +65,7 @@ title:  "简单的序列比对教程"
 
 不同的平台，不同的公司可能产生不同的数据，所以对数据进行初步的质检和过滤是必要的。质检和过滤 FASTQ 的工具有很多，例如 [fastp](https://doi.org/10.1093/bioinformatics/bty560)，[trimmomatic](https://doi.org/10.1093/bioinformatics/btu170) 等。这里以 fastp 为例。
 
-使用下面的命令安装 fastp。
+fastp 可以用 apt 安装。
 
 ```bash
 sudo apt install fastp
@@ -144,7 +186,9 @@ gzip -d IRGSP-1.0_representative_transcript_exon_2024-07-12.gtf.gz
     --outTmpDir /tmp/star
 ```
 
-获得的 `DJ-3_Aligned.sortedByCoord.out.bam` 就是比对结果的 BAM 文件，而 `DJ-3_ReadsPerGene.out.tab` 中则有每个基因上有多少个 reads 比对上的 counts 数据。其内部有 4 列：
+获得的 `DJ-3_Aligned.sortedByCoord.out.bam` 就是比对结果的 BAM 文件。
+
+通过添加 `--quantMode GeneCounts` 选项，可以获得 `DJ-3_ReadsPerGene.out.tab` 文件，这个文件中有代表基因表达量的 counts 数据。其内部有 4 列：
 
 1. 基因 ID
 2. Map 到基因上的 no strand 的 reads 数（Ambiguous 的 reads 不会被计数）
@@ -244,3 +288,4 @@ do
     samtools index ${out_bam} 2>> ${bwa_log}
 done
 ```
+
