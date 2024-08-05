@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "简单的WSL教程"
+title:  "简单的 WSL 教程"
 ---
 
 ## 安装 WSL
