@@ -126,8 +126,6 @@ done
 
 ## 序列比对
 
-### 基因组序列比对
-
 ### 转录组序列比对
 
 可用于比对转录组测序数据的软件有很多，例如 [STAR](https://doi.org/10.1093/bioinformatics/bts635)、[HISAT2](https://www.nature.com/articles/s41587-019-0201-4) 等。这里以 STAR 为例。
