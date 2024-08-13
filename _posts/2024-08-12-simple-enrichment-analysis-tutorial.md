@@ -1,6 +1,7 @@
 ---
 layout: post
 title:  "简单的富集分析教程"
+categories: 教程
 ---
 
 ## 富集分析的原理

@@ -1,7 +1,6 @@
 ---
 layout: post
 title:  "简单的 GWAS 教程"
-date:   2022-06-22 05:30:00 +0800
 categories: 教程
 ---
 

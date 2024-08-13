@@ -1,7 +1,6 @@
 ---
 layout: post
 title:  "在 WSL 中安装 RStudio Server"
-date:   2021-03-09 10:10:00 +0800
 categories: 笔记
 ---
 

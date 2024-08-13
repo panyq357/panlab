@@ -1,6 +1,7 @@
 ---
 layout: post
 title:  "简单的序列比对教程"
+categories: 教程
 ---
 
 ## 文件格式

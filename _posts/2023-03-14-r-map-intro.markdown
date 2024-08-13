@@ -1,7 +1,6 @@
 ---
 layout: post
 title:  "用 R 画地图"
-date:   2023-03-14 21:30:00 +0800
 categories: 教程
 ---
 

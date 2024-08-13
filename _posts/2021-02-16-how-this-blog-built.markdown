@@ -1,7 +1,6 @@
 ---
 layout: post
 title:  "博客搭建流程"
-date:   2021-02-16 18:35:00 +0800
 categories: 笔记
 ---
 

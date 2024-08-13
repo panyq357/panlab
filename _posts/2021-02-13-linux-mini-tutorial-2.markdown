@@ -1,7 +1,6 @@
 ---
 layout: post
 title:  "Linux 入门小教程（续）"
-date:   2021-02-13 15:57:00 +0800
 categories: 教程
 ---
 
