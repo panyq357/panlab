@@ -6,7 +6,7 @@ categories: 教程
 
 ## 获得 counts 矩阵
 
-在[简单的序列比对教程](/_drafts/simple-sequance-alignment-tutorial.md)中，我们用 STAR 对转录组数据进行了序列比对，并通过添加 `--quantMode GeneCounts` 选项，得到了每个基因的 counts。
+在[简单的序列比对教程]({% post_url 2024-08-12-simple-sequance-alignment-tutorial %})中，我们用 STAR 对转录组数据进行了序列比对，并通过添加 `--quantMode GeneCounts` 选项，得到了每个基因的 counts。
 
 接着，我们便可以将数据读进 R，将数据合并成为一个 counts 矩阵。
 
@@ -131,9 +131,10 @@ deseq2_res[c("Name", "Description")] <- rap_anno[
 # 输出结果
 write.csv(deseq2_res, "deseq2_res_anno.csv")
 ```
+
 ## 后续
 
 在获得了差异表达分析结果后，我们可以：
 
-- 用差异表达分析结果中的 Log2FoldChange 和 padj，画一个火山图（参考[简单的 ggplot2 教程](/_posts/2024-08-16-simple-ggplot2-tutorial.md)）
-- 提取有差异的基因的 ID，进行富集分析（参考[简单的富集分析教程](/_posts/2024-08-12-simple-enrichment-analysis-tutorial.md)）
+- 用差异表达分析结果中的 Log2FoldChange 和 padj，画一个火山图（参考[简单的 ggplot2 教程]({% post_url 2024-08-16-simple-ggplot2-tutorial %})）
+- 提取有差异的基因的 ID，进行富集分析（参考[简单的富集分析教程]({% post_url 2024-08-12-simple-enrichment-analysis-tutorial %})）

@@ -4,4 +4,5 @@
 
 layout: home
 list_title: 文章
+list_title_pinned: 置顶
 ---

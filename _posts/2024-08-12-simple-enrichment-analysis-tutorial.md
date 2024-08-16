@@ -17,7 +17,7 @@ categories: 教程
 # [1] 0.0003572279
 ```
 
-现在把球换成基因，假设我们通过[差异表达分析](/_drafts/simple-de-analysis-tutorial.md)获得了 1000 个差异表达的基因，其中有 100 个基因调控株高，而已知水稻中有 30000 个基因，其中有 300 个基因调控株高。我们想知道差异表达的基因中，调控株高的是不是明显比随机抽样要更多，我们也可以计算随机抽样的情况下，抽 1000 个基因中有 100 个是调控株高的基因的概率。
+现在把球换成基因，假设我们通过[差异表达分析]({% post_url 2024-08-12-simple-de-analysis-tutorial %})获得了 1000 个差异表达的基因，其中有 100 个基因调控株高，而已知水稻中有 30000 个基因，其中有 300 个基因调控株高。我们想知道差异表达的基因中，调控株高的是不是明显比随机抽样要更多，我们也可以计算随机抽样的情况下，抽 1000 个基因中有 100 个是调控株高的基因的概率。
 
 ```r
 1 - phyper(q=100, m=300, n=30000-300, k=1000)
@@ -29,7 +29,7 @@ categories: 教程
 现在我们不只想知道调控株高的基因是否显著地多，还想知道其他功能的基因是否显著地多。于是我们便可以这样做：
 
 1. 统计这 1000 个基因中每种功能都有几个基因（株高有几个，分蘖有几个……）
-2. 统计所有的 30000 个基因中，每种功能都有几个基因
+2. 统计全基因组范围的所有的 30000 个基因中，每种功能都有几个基因
 3. 对每种功能，都用上面的方法计算一遍概率
 4. 将结果汇总在一个表里，按概率从低到高排，便知道这 1000 个基因中，调控哪些功能的基因的数量显著地要多了
 
@@ -37,7 +37,7 @@ categories: 教程
 
 ## 基因的注释数据
 
-以水稻为例，在 [Oryzabase](https://shigen.nig.ac.jp/rice/oryzabase/) 中搜索一个基因，我们搜到这个基因的 Gene Ontology，Trait Ontology 和 Plant Ontology 注释。
+以水稻为例，在 [Oryzabase](https://shigen.nig.ac.jp/rice/oryzabase/) 中搜索一个基因，我们可以搜到这个基因的 Gene Ontology，Trait Ontology 和 Plant Ontology 注释。
 
 这些 Ontology 注释就是描述这个基因的功能的，一种标准化的标签。
 
@@ -57,13 +57,17 @@ BiocManager::install("clusterProfiler")
 然后，就可以用 clusterProfiler 提供的函数和整理好的注释数据，对未知功能的基因集进行注释了。
 
 ```r
-onto = readxl::read_excel("oryzabase-ontologies.xlsx", sheet="RAP_GO")
+# 读入注释数据
 # Excel 文件里有不同的 sheet，对应不同的 Ontology 和不同的基因 ID
-# 比如将上面的 sheet 参数换成
+# 比如将 sheet 换成 "MSU_TO"，便可用 MSU 的 ID 及进行 Trait Ontology 的富集分析了
+onto = readxl::read_excel("oryzabase-ontologies.xlsx", sheet="RAP_GO")
 
-gene = c("Os01g0118100", "Os01g0549700", "Os02g0710800", "Os03g0108600", "Os03g0158200", "Os03g0746500")  # 这里给要富集分析的基因集的基因号
+# 这里给要富集分析的基因集的基因号
+gene = c("Os01g0118100", "Os01g0549700", "Os02g0710800", "Os03g0108600", "Os03g0158200", "Os03g0746500")
+
 universe = NULL  # NULL 意为将所有基因作为背景，更常见的做法是将 RNA-seq 所有能测到的基因作为背景
 
+# 富集分析
 enrich_res = clusterProfiler::enricher(
     gene=gene,
     universe=universe,
@@ -71,10 +75,11 @@ enrich_res = clusterProfiler::enricher(
     TERM2NAME=onto[c("OntoID", "Description")]
 )
 
+# 导出结果
 write.csv(as.data.frame(enrich_res), "enrich_res.csv")
 ```
 
-输出的 `enrich_res.csv` 文件里就写了每种功能的基因的富集结果了。
+输出的 `enrich_res.csv` 文件里就写了每种 Ontology 的富集结果了。
 
 clusterProfiler 也提供了一些方便的绘图函数，比如绘制气泡图的 `dotplot()`。
 
