@@ -62,7 +62,7 @@ SAM 格式的全称是 Sequence Alignment/Map，它在 FASTQ 的基础上添加�
 
 ## 质检和过滤
 
-这里使用[简单的公共数据下载教程](/_drafts/simple-download-public-data-tutorial.md)中下载的 FASTQ 数据作为例子。
+这里使用[简单的公共数据下载教程]({% post_url 2024-08-12-simple-de-analysis-tutorial %})中下载的 FASTQ 数据作为例子。
 
 不同的平台，不同的公司可能产生不同的数据，所以对数据进行初步的质检和过滤是必要的。质检和过滤 FASTQ 的工具有很多，例如 [fastp](https://doi.org/10.1093/bioinformatics/bty560)，[trimmomatic](https://doi.org/10.1093/bioinformatics/btu170) 等。这里以 fastp 为例。
 
@@ -86,7 +86,7 @@ fastp \
     --report_title DJ-3
 ```
 
-再过滤完成后，生成的 `DJ-1_R1.fastq.gz` 和 `DJ-3_R2.fastq.gz` 就是过滤后的 gzip 压缩的 FASTQ 数据。可在浏览器中打开 `DJ-3.html` 以查看质检报告。
+在过滤完成后，生成的 `DJ-1_R1.fastq.gz` 和 `DJ-3_R2.fastq.gz` 就是过滤后的 gzip 压缩的 FASTQ 数据。可在浏览器中打开 `DJ-3.html` 以查看质检报告。
 
 我们可以将 RUN ID 和样本名称写进一个关联数组中，然后用 for 循环进行批量处理。
 
@@ -131,7 +131,7 @@ done
 
 可用于比对转录组测序数据的软件有很多，例如 [STAR](https://doi.org/10.1093/bioinformatics/bts635)、[HISAT2](https://www.nature.com/articles/s41587-019-0201-4) 等。这里以 STAR 为例。
 
-STAR 的编译好的二进制可执行文件可在 STAR 的 Github 仓库上找到：[点这里](https://github.com/alexdobin/STAR/releases)。将其下载到 WSL 中，解压后就可使用。
+STAR 的编译好的二进制可执行文件可在 STAR 的 Github 仓库上找到（[点这里](https://github.com/alexdobin/STAR/releases)）。将其下载到 WSL 中，解压后就可使用。
 
 ```bash
 # 下载
@@ -226,7 +226,7 @@ do
 done
 ```
 
-当完成了所有样本的比对，可将所有的 `ReadsPerGene.out.tab` 文件的内容合并为一个 counts 矩阵，用于进行后续的差异表达分析（参考：[简单的差异表达分析教程](/_drafts/simple-de-analysis-tutorial.md)。
+当完成了所有样本的比对，可将所有的 `ReadsPerGene.out.tab` 文件的内容合并为一个 counts 矩阵，用于进行后续的差异表达分析（参考：[简单的差异表达分析教程]({% post_url 2024-08-12-simple-de-analysis-tutorial %})）。
 
 ### 基因组序列比对
 

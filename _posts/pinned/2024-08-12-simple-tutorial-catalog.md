@@ -11,7 +11,7 @@ pinned: true
 
 然后，要进行测序数据的分析，需要有数据，关于数据的获取可以参考[简单的公共数据下载教程]({% post_url 2024-08-12-simple-public-data-download-tutorial %})。
 
-在获得了原始测序数据后，几乎所有对测序数据进行分析的流程的起点都是序列比对，关于序列比对可以参考[简单的序列比对教程]({% post_url 2024-08-12-simple-sequance-alignment-tutorial %})
+在获得了原始测序数据后，几乎所有对测序数据进行分析的流程的起点都是序列比对。关于序列比对可以参考[简单的序列比对教程]({% post_url 2024-08-12-simple-sequance-alignment-tutorial %})
 
 对于转录组数据分析，在序列比对完之后，会：
 
