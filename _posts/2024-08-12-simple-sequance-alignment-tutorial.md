@@ -166,7 +166,7 @@ gzip -d IRGSP-1.0_representative_transcript_exon_2024-07-12.gtf.gz
     --genomeSAindexNbases 13
 ```
 
-建完索引后，便可进行序列比对。
+建完索引后，便可进行序列比对（这里用到的 FASTQ 数据是上面用 fastp 过滤过后的）。
 
 ```bash
 ./STAR_2.7.11b/Linux_x86_64_static/STAR \
@@ -244,15 +244,17 @@ sudo apt install bwa samtools
 bwa index IRGSP-1.0_genome.fasta
 ```
 
-建完索引后，便可进行序列比对。
+建完索引后，便可进行序列比对（这里用到的 FASTQ 数据是上面用 fastp 过滤过后的）。
 
 ```bash
 sample="A1-Input"
+r1="${sample}_R1.fastq.gz"
+r2="${sample}_R2.fastq.gz"
 bwa_log=${sample}.bwa.log
 out_bam=${sample}.bam
 
 bwa mem -M -t 16 -R "@RG\\tID:${sample}\\tSM:${sample}" \
-    IRGSP-1.0_genome.fasta ${sample}_R1.fastq.gz ${sample}_R2.fastq.gz 2>> ${bwa_log} \
+    IRGSP-1.0_genome.fasta $r1 $r2 2>> ${bwa_log} \
 | samtools fixmate -u -m - - 2>> ${bwa_log} \
 | samtools sort -u -@2 2>> ${bwa_log} \
 | samtools markdup -u -@16 - - 2>> ${bwa_log} \
@@ -270,6 +272,8 @@ samples=( "A1-Input" "A1-1" "A1-2" )
 
 for sample in ${samples[@]}
 do
+    r1="${sample}_R1.fastq.gz"
+    r2="${sample}_R2.fastq.gz"
     bwa_log=${sample}.bwa.log
     out_bam=${sample}.bam
 
@@ -278,7 +282,7 @@ do
     fi
 
     bwa mem -M -t 16 -R "@RG\\tID:${sample}\\tSM:${sample}" \
-        IRGSP-1.0_genome.fasta ${sample}_R1.fastq.gz ${sample}_R2.fastq.gz 2>> ${bwa_log} \
+        IRGSP-1.0_genome.fasta $r1 $r2 2>> ${bwa_log} \
     | samtools fixmate -u -m - - 2>> ${bwa_log} \
     | samtools sort -u -@2 2>> ${bwa_log} \
     | samtools markdup -u -@16 - - 2>> ${bwa_log} \
@@ -287,4 +291,3 @@ do
     samtools index ${out_bam} 2>> ${bwa_log}
 done
 ```
-

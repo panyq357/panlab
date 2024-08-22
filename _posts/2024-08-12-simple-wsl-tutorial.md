@@ -62,18 +62,23 @@ wsl --install -d Debian
 
 我们所安装的 Debian 自带有一个名为 `apt` 的软件包管理器。
 
-以下是一个用 `apt` 安装 `git` 的例子。
+`apt` 会将软件安装到系统的目录下，所以一般需要搭配 `sudo` 命令获取管理员权限。在使用 `apt` 安装软件前，通常需要用如下命令更新软件包索引。
 
 ```bash
 sudo apt update
+```
+
+更新完索引后，便可安装软件。以下是一个用 `apt` 安装 `git` 的例子。
+
+```bash
 sudo apt install git
 ```
 
-键入命令后，会提示输入密码（即安装 WSL 时设置的密码），以及询问是否确认安装（键入 `y` 即可）。
+由于使用了 `sudo` 进行提权，在键入命令后，会提示输入管理员密码（即安装 WSL 时设置的密码）。
 
-命令开头的 `sudo` 意为提升权限至超级管理员，这对“用 `apt` 安装软件”这种修改系统内部文件的操作来说是必须的。
+之后会询问是否确认安装，键入 `y` 即可。
 
-使用 `sudo apt remove` 命令可用 `apt` 删除软件。
+若要卸载软件，使用 `sudo apt remove` 命令可用 `apt` 删除软件。
 
 绝大部分常用的软件都可用 `apt install` 来安装。然而对于一些生信分析中用到的软件，可能并没有打包到 `apt` 上，这时便需要仔细阅读软件作者提供的安装说明进行安装。常见的安装方法有直接下载可执行二进制文件、下载源代码编译，使用 conda 安装等。
 
@@ -96,18 +101,165 @@ Linux 中存在有两种路径：绝对路径和相对路径。绝对路径是�
 - `file1`（或 `./file1`） - 当前目录下 `file1` 文件的相对路径
 - `~/Documents/file1` 家目录下 `file1` 文件的绝对路径，等于 `/home/user/Documents/file1`
 
+### Bash 基本语法
+
+刚才用来输入命令的终端是一个 Bash 终端。除了可以直接输入命令执行，我们也可以在 Bash 里运行一些 Bash 脚本语句，方便我们一次性处理多个文件。
+
+网上有很多的教程可供深入学习（例如：[阮一峰的 Bash 脚本教程](https://wangdoc.com/bash/)），这里只介绍一些基本的语法。
+
+#### 变量与字符串
+
+首先，定义一个变量 `x`，它的值是一个字符串 `"world"`（注意：等号的左右不能有空格）。
+
+```bash
+x="world"
+```
+
+我们可以用 `$` 符号提取这个变量的值。
+
+```bash
+echo hello, $x!
+# hello, world!
+```
+
+Bash 中有两种字符串：用双引号引起来的，和用单引号引起来的（注意：是半角的英文引号）。
+
+双引号字符串内可用 `$` 符号将变量替换为对应的值，而单引号则不会进行这些操作。
+
+```bash
+echo "hello, $x!"
+# hello, world!
+echo 'hello, $x!'
+# hello, $x!
+```
+
+有时，为了避免变量名后面的字母引发歧义，我们会在用 `$` 替换变量值时用花括号 `{}` 将其括起来。
+
+```bash
+xy="me"
+echo "hello, $xy!"
+# hello, me!
+echo "hello, ${x}y!"
+# hello, worldy!"
+```
+
+`$` 符号除了可以替换变量的值，也可以用来替换命令的输出结果。
+
+```bash
+touch file1 file2 file3
+echo "Files in this directory: $(ls -m)"
+# Files in this directory: file1, file2, file3
+```
+
+要删除一个变量，可使用 `unset` 命令。
+
+```bash
+unset xy
+```
+
+#### 数组与循环
+
+Bash 中可以用 `()` 定义数组。普通的索引数组的定义方法如下所示。
+
+```bash
+index_array=(a b c)
+```
+
+对于索引数组，元素的索引是从 0 开始的整数。我们可以用 `${}` 加上 `[]` 和元素的索引，从数组中提取元素。
+
+```bash
+echo "1st: ${index_array[0]}, 2nd: ${index_array[1]}"
+# 1st: a, 2nd: b
+```
+
+将 `@` 符号放入 `[]` 中，可提取数组的所有元素。
+
+```bash
+echo "All items: ${index_array[@]}"
+# All items: a b c
+```
+
+配合使用 for-in 循环，可依次遍历数组的元素。
+
+```bash
+for item in ${index_array[@]}
+do
+    echo "Iterating item: ${item}."
+done
+# Iterating item: a.
+# Iterating item: b.
+# Iterating item: c.
+```
+
+Bash 中还有一种可自定义索引名称的数组：关联数组。定义关联数组必须使用 `declare -A` 命令声明。
+
+```bash
+declare -A assoc_array
+assoc_array=(["A"]=file1 ["B"]=file2 ["C"]=file3)
+```
+
+关联数组提取所有元素的方法与索引数组一样，除此之外，还可以在关联数组变量名前添加一个 `!`，以提取所有的索引名。
+
+```bash
+echo "All values: ${assoc_array[@]}."
+# All values: file3 file2 file1.
+echo "All keys: ${!assoc_array[@]}."
+# All keys: C B A.
+```
+
+搭配 for-in 循环，便可同时遍历数组的元素及其索引了。
+
+```bash
+for index in ${!assoc_array[@]}
+do
+    echo "Key: ${index}, value: ${assoc_array[$index]}"
+done
+# Key: C, value: file3
+# Key: B, value: file2
+# Key: A, value: file1
+```
+
+#### 模式扩展
+
+很多时候，我们要处理的文件的名字中存在重复的部分（例如 `file1`、`file2` 和 `file3`）。
+
+Bash 中有一些模式扩展的方法，以下是一些例子。
+
+```bash
+ls  # 列出当前目录下的文件
+# file1  file2  file3
+
+touch file{4..6}  # 新建以 file 开头，以 4、5 和 6 结尾的文件
+
+ls
+# file1  file2  file3  file4  file5  file6
+
+gzip file*
+
+ls
+# file1.gz  file2.gz  file3.gz  file4.gz  file5.gz  file6.gz
+```
+
 ## WSL 与 Windows 的协作
+
+### 右键+在终端中打开
 
 大部分时候，我们想要做的是在 WSL 中运行软件，来处理 Windows 文件系统下的数据。
 
 在 WSL 中，Windows 的各个磁盘的映射位于 `/mnt/` 目录下，例如 C 盘就是 `/mnt/c/`，D 盘就是 `/mnt/d/`。但如果每次都要先打开 WSL，再一路 `cd` 到数据存放的目录，还是太麻烦了。
 
-通过安装 Windows Terminal 可以解决这个问题。Windows 11 默认是安装有 Windows Terminal 软件的，而 Windows 10 也可以在 Microsoft Store 搜索安装。
+通过安装 Windows Terminal，可以让我们在 Windows 的文件资源管理器中，通过 `右键` + `在终端中打开`，在当前目录下打开 WSL，并切换好工作目录。
 
-在安装完 Windows Terminal 后，文件资源管理器的右键菜单里便会出现“在终端中打开”的选项，但这时默认打开的是 Windows 的 Powershell。可在 Windows Terminal 里按 `Ctrl` + `,`，在 `设置 > 启动 > 默认配置文件` 处将默认启动的终端修改成 Debian，这样默认打开的就是 WSL 了，而且 WSL 的工作目录也会自动切换到当前目录下了。
+Windows 11 默认是安装有 Windows Terminal 软件的，而 Windows 10 也可以在 Microsoft Store 搜索安装。
+
+在安装完 Windows Terminal 后，文件资源管理器的右键菜单里便会出现 `在终端中打开` 的选项，但这时默认打开的是 Windows 的 Powershell。
+
+可在 Windows Terminal 里按 `Ctrl` + `,`，在 `设置 > 启动 > 默认配置文件` 处将默认启动的终端修改成 Debian，这样默认打开的就是 WSL 了。
+
+### 在 WSL 中启动 Windows 上的软件
 
 在 WSL 中，也可使用一些命令来启动安装在 Windows 上的软件。
 
-例如在 WSL 中键入 `explorer.exe .`（注意要有个 `.`）便可在文件资源管理器中打开当前目录。
+例如在 WSL 中键入 `explorer.exe .`（注意要有个 `.`）便可用文件资源管理器中打开当前工作目录。
 
 如果 Windows 下安装有 [Visual Studio Code](https://code.visualstudio.com/)，在 WSL 中键入 `code .`，便可在当前目录启动 VSCode。而 VSCode 里也有名为微软开发的 WSL 的插件，安装后可进一步方便在 WSL 中的开发工作。
