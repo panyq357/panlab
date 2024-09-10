@@ -72,7 +72,7 @@ coldata <- data.frame(
 )
 
 # 对 counts 矩阵进行初步过滤，去掉在所有样本中被测到的总次数不大于 10 的基因
-cts[rowSums(cts) >= 10,]
+cts <- cts[rowSums(cts) >= 10,]
 
 # 生成一个 DESeq 对象，并告知用 coldata 中的 Group 作为差异表达分组的依据
 dds <- DESeqDataSetFromMatrix(cts, coldata, ~ Group)

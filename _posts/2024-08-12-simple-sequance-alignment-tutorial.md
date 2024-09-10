@@ -4,6 +4,8 @@ title:  "简单的序列比对教程"
 categories: 教程
 ---
 
+序列比对是大部分生信分析流程的开端。在这篇教程中，我们首先介绍一下常见的序列比对过程中用到的文件格式，然后以在[简单的公共数据下载教程]({% post_url 2024-08-12-simple-de-analysis-tutorial %})中下载下来的数据为例，介绍一下转录组测序数据和基因组测序数据的序列比对方法。
+
 ## 文件格式
 
 在序列比对流程中，会遇到多种文件格式：
@@ -247,20 +249,16 @@ bwa index IRGSP-1.0_genome.fasta
 建完索引后，便可进行序列比对（这里用到的 FASTQ 数据是上面用 fastp 过滤过后的）。
 
 ```bash
-sample="A1-Input"
-r1="${sample}_R1.fastq.gz"
-r2="${sample}_R2.fastq.gz"
-bwa_log=${sample}.bwa.log
-out_bam=${sample}.bam
-
 bwa mem -M -t 16 -R "@RG\\tID:${sample}\\tSM:${sample}" \
-    IRGSP-1.0_genome.fasta $r1 $r2 2>> ${bwa_log} \
-| samtools fixmate -u -m - - 2>> ${bwa_log} \
-| samtools sort -u -@2 2>> ${bwa_log} \
-| samtools markdup -u -@16 - - 2>> ${bwa_log} \
-| samtools view -b -h -@16 -o ${out_bam} 2>> ${bwa_log}
+    IRGSP-1.0_genome.fasta \
+    A1-Input_R1.fastq.gz \
+    A1-Input_R2.fastq.gz \
+| samtools fixmate -u -m - - \
+| samtools sort -u -@2 \
+| samtools markdup -u -@16 - - \
+| samtools view -b -h -@16 -o A1-Input.bam
 
-samtools index ${out_bam} 2>> ${bwa_log}
+samtools index A1-Input.bam
 ```
 
 同样的，也可以写一个循环进行批量处理。
@@ -282,12 +280,12 @@ do
     fi
 
     bwa mem -M -t 16 -R "@RG\\tID:${sample}\\tSM:${sample}" \
-        IRGSP-1.0_genome.fasta $r1 $r2 2>> ${bwa_log} \
-    | samtools fixmate -u -m - - 2>> ${bwa_log} \
-    | samtools sort -u -@2 2>> ${bwa_log} \
-    | samtools markdup -u -@16 - - 2>> ${bwa_log} \
-    | samtools view -b -h -@16 -o ${out_bam} 2>> ${bwa_log}
+        IRGSP-1.0_genome.fasta ${r1} ${r2} \
+    | samtools fixmate -u -m - - \
+    | samtools sort -u -@2 \
+    | samtools markdup -u -@16 - - \
+    | samtools view -b -h -@16 -o ${out_bam}
 
-    samtools index ${out_bam} 2>> ${bwa_log}
+    samtools index ${out_bam}
 done
 ```
