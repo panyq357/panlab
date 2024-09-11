@@ -160,7 +160,7 @@ sudo apt install git
 
 网上有很多的教程可供深入学习（例如：[阮一峰的 Bash 脚本教程](https://wangdoc.com/bash/)），这里只介绍一些基本的语法。
 
-### 变量与字符串
+### 1) 变量与字符串
 
 首先，定义一个变量 `x`，它的值是一个字符串 `"world"`（注意：等号的左右不能有空格）。
 
@@ -210,7 +210,7 @@ echo "Files in this directory: $(ls -m)"
 unset xy
 ```
 
-### 数组与循环
+### 2) 数组与循环
 
 Bash 中可以用 `()` 定义数组。普通的索引数组的定义方法如下所示。
 
@@ -272,7 +272,7 @@ done
 # Key: A, value: file1
 ```
 
-### 模式扩展
+### 3) 模式扩展
 
 很多时候，我们要处理的文件的名字中存在重复的部分（例如 `file1`、`file2` 和 `file3`）。
 
@@ -292,3 +292,6 @@ gzip file*
 ls
 # file1.gz  file2.gz  file3.gz  file4.gz  file5.gz  file6.gz
 ```
+
+## 6. 环境变量
+

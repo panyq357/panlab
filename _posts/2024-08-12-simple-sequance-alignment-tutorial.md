@@ -4,7 +4,9 @@ title:  "简单的序列比对教程"
 categories: 教程
 ---
 
-序列比对是大部分生信分析流程的开端。在这篇教程中，我们首先介绍一下常见的序列比对过程中用到的文件格式，然后以在[简单的公共数据下载教程]({% post_url 2024-08-12-simple-de-analysis-tutorial %})中下载下来的数据为例，介绍一下转录组测序数据和基因组测序数据的序列比对方法。
+序列比对是大部分生信分析流程的开端。
+
+在这篇教程中，我们首先介绍一下常见的序列比对过程中用到的[文件格式](#文件格式)：[FASTA](#fasta)、[FASTQ](#fastq) 和 [SAM/BAM](#sambam)，然后以[简单的公共数据下载教程]({% post_url 2024-08-12-simple-de-analysis-tutorial %})中下载下来的数据为例，介绍一下原始测序数据的[质检与过滤](#质检和过滤)，以及之后的[转录组序列比对](#转录组序列比对)和[基因组序列比对](#基因组序列比对)的方法。
 
 ## 文件格式
 
@@ -54,13 +56,20 @@ FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF:FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
 
 一条 read 由 4 行组成。第一行以 `@` 开头，后面紧跟这条 read 的名字；第二行是这条 read 的序列；第三行通常以 `+` 作为分隔符，第四行则是代表测序质量的字符串，与第二行等长。
 
-现在很多测序数据都是双端测序的，即测序时是从一个 DNA 片段的两端向中间测，所以一个测序数据由两个 FASTQ 文件组成（例如 `SRR15724032_1.fastq.gz` 和 `SRR15724032_2.fastq.gz`）。两个 FASTQ 里 reads 的顺序是匹配的，即文件 1 里的第 1 个 read 与 文件 2 的第 1 个 read 配对，文件 1 里的第 2 个 read 与 文件 2 的第 2 个 read 配对……
+现在很多测序数据都是双端测序的，即测序时是从一个 DNA 片段的两端向中间测，所以一个样品的测序数据由两个 FASTQ 文件组成（例如 `SRR15724032_1.fastq.gz` 和 `SRR15724032_2.fastq.gz`）。两个 FASTQ 里 reads 的顺序是匹配的，即文件 1 里的第 1 个 read 与 文件 2 的第 1 个 read 配对，文件 1 里的第 2 个 read 与 文件 2 的第 2 个 read 配对……
 
-现在的序列比对软件对双端测序数据进行特殊处理，使得比对结果能够利用双端数据的特性变得更准。
+现在的序列比对软件都能对双端测序数据进行特殊处理，利用双端数据的特性使比对结果更准。
 
 ### SAM/BAM
 
-SAM 格式的全称是 Sequence Alignment/Map，它在 FASTQ 的基础上添加了每个 reads 的比对信息。而 BAM 就是 Binary 的 SAM。BAM 可保留 SAM 的所有信息，并且体积更小，所以一般都会将比对的结果转化为 BAM 保存。
+SAM 格式的全称是 Sequence Alignment/Map，它在 FASTQ 的基础上添加了每个 reads 的比对信息。你可以在[这里](https://samtools.github.io/hts-specs/)找到 SAM/BAM 的格式标准文档。
+
+```
+SRR15724028.8601186	161	chr01	1012	1	105M45S	chr12	4186162	0	ACCCTAAACCCTAAACCCTAAACCCTAAACCCTAAACCCTAAACCCTAACCCTAAACCCTAACCCTAAACCCTAAACCCTAAACCCAAAAACCTAAACCATAAACCAAAAACACAAAACCCTAAACACTAAAAAAAAAACAATAAAACCT	FFFFF:F::FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF:FFFFFFFFFFFFFFFFFFFFF,:FFFFF,FFFFFF,F,,FF:F:F,FFF,:,:FFF,,,FFFFF,,,FFF:,:,F:F::,,,,FFF:,FFF,,,,FF,FF,,F,FF,F,	NM:i:3	MD:Z:86T3C8C5	AS:i:90	XS:i:85	RG:Z:A1-Input	MQ:i:60	MC:Z:15S135M	ms:i:5355
+SRR15724028.952697	99	chr01	1029	45	77M	=	1029	77	CTAAACCCTAAACCCTAAACCCTAAACCCTAACCCTAAACCCTAACCCTAAACCCTAAACCCTAAACCCTGAACCCT	FFFFFFFFFFF:FFFFFFFFFFFFF:FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF	NM:i:1	MD:Z:70A6	AS:i:72	XS:i:65	RG:Z:A1-Input	MQ:i:44	MC:Z:77M	ms:i:2764
+```
+
+SAM 文件可转换为 BAM 格式，BAM 就是 Binary 的 SAM。BAM 可保留 SAM 的所有信息，并且体积更小，所以一般都会将比对的结果转化为 BAM 保存。
 
 ## 质检和过滤
 
@@ -143,7 +152,7 @@ wget https://github.com/alexdobin/STAR/releases/download/2.7.11b/STAR_2.7.11b.zi
 unzip STAR_2.7.11b.zip
 ```
 
-解压出来的二进制文件（例如 `./STAR_2.7.11b/Linux_x86_64_static/STAR`）可放到 PATH 中，也可直接使用。
+解压出来的二进制文件（例如 `STAR_2.7.11b/Linux_x86_64_static/STAR`）可放到 PATH 中，也可直接使用。
 
 使用 STAR 进行转录组序列比对前需要建个索引，而建索引需要 FASTA 格式的参考基因组序列和 GTF 格式的参考基因组注释数据。
 
